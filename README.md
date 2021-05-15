@@ -1,14 +1,14 @@
-# Experimenting with Algorithms and Structures
-A set of implementations looking at different algorithms and structures in Python. These form an investigation into various implementation techniques (e.g. adding operators) and some interesting algorithms.
+# Big Integer Multiplication
+A set of notebooks looking at different algorithms for multiplying integer. These form an investigation into various implementation techniques (e.g. adding operators) and some interesting algorithms. The aim is to build code that can handle multiplication (and add/subtract) in any base, from binary through decimal to 'base 1,000,000' and above. It will also handle long integers - 10s of thousands of digits or 'limbs' long.
 
-## Integer Manipulation - Algorithms
-[Jupyter workbook](https://github.com/darrenpaine/algorithms-and-structures/blob/main/Integer%20Manipulation%20-%20Algorithms.ipynb) looking at the mechanisms for integer arithmatic by implementing different algorithms for integer manipulation. The initial focus is on the ['Karatsuba Multiplication Algorithm'](https://en.wikipedia.org/wiki/Karatsuba_algorithm). It turns out that multiplication using the algorithm we learned in school (shift across, multiply each digit, carry over, etc) is not the most efficient, especially when dealing with very large integers - such as those used in cryptography.
-First, the algorithm is tested out in Python integers. Then, a BaseInteger class will be developed that will take in different representations and build up to addition, multiplication, different bases (from binary to base 36), powers, subtraction and division. Various operators, such as +, \*, - are then added.
-Once developed in Jupyter notebook, the final implementation is transferred to baseinteger.py - to be done.
+The notebooks are:
+1. [Integer Multiplication using Karatsuba method]() Investigation of the Karatsuba algorithm.
+2. [Multiplication with Fast Fourier Transform]() looking at Fast Fourier Transforms (FFTs) for multiplication.
+3. [Multiplication with Number Theoretic Transform]() - Number Theoretic Transforms (NTTs), which are FFTs using modular arithmatic and are the basis of the Schönhage-Strassen methods and other further improvements.
 
-## Implementation of sorting algorithms
-[Jupyter workbook](https://github.com/darrenpaine/algorithms-and-structures/blob/main/Merge%20and%20Search%20Algorithms.ipynb) for sorting using Python.
-1) Implementing MergeSort
+The final version of the class can be also found in the [bigbaseinteger.py file](), which includes unit tests. As we are implementing in Python, we are at a disadvantage in general compared to - for example, writing this in optimised C or C++, but it is useful to see how the algorithms work and what improvements can be made.
 
-## Simple Expression Parser
-[Jupyter workbook](https://github.com/darrenpaine/algorithms-and-structures/blob/main/Numerical%20Expression%20Parser.ipynb) which shows the implementation of a simple mathematical expression parser. This implements a Stack class which extends a Linkedist, to perform postfix evaluation (1 2 + = ?), then infix evaluation (1 + 2 = ?).
+TO DO:
+- Add other functionality, such as division, powers, modular arithmaetic, 'integer square root'.
+- Implement other mechanisms, such as 'school' long multiplication and 'Russian Peasent' multiplication.
+- A C or C++ implementation
