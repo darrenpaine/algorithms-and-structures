@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/.vs/ProjectSettings.json
+/.vs/algorithms-and-structures/v16
+/.vs

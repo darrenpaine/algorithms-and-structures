@@ -128,10 +128,10 @@ class BaseBigInteger:
         result, neg = self._add_numbers(self._number, self._negative, other._number, other._negative)
         return BaseBigInteger(result, self._base, neg, self._store)
     
-
     def __mul__(self, other):
         result, neg = self._multiply_numbers(self._number.copy(), other._number.copy())
         return BaseBigInteger(result, self._base, neg | (self._negative != other._negative))
+
     def __sub__(self, other):
         result, neg = self._add_numbers(self._number, self._negative, other._number, not other._negative)
         return BaseBigInteger(result, self._base, neg, self._store)
@@ -145,7 +145,7 @@ class BaseBigInteger:
         
         # Make a copy (or it has side-effects elsewhere)
         # Take the longer one, so that we fit all the numbers in
-        bigger, smaller = self.get_bigger_smaller(n1,n2)
+        bigger, smaller = BaseBigInteger.get_bigger_smaller(n1,n2)
         overlap = len(smaller)
         result = bigger.copy()
         
@@ -167,19 +167,18 @@ class BaseBigInteger:
         return self._add_numbers(n1, neg1, n2, not neg2)
 
     def _multiply_numbers(self, first, second):
-        # If one is single digit, this is the base case:
+        # Find the longest of the two
         lenfirst = len(first)
         lensecond = len(second)
         if lenfirst < lensecond:
             first, second = second,first
             lenfirst, lensecond = lensecond, lenfirst
-        if lenfirst == 1:
-            return self.propogate_carryovers(second[:] * first[0], self._base, False)
-            #return result, False
+
+        # Base case - use numpy integer arithmetic
         if lensecond == 1:
             return self.propogate_carryovers(first[:] * second[0], self._base, False)
             #return result, False
-        if not lenfirst or not lensecond:
+        if not lensecond:
             return np.zeros(1, dtype=self._store), False
 
         # Split the digits into two halves:
@@ -193,20 +192,20 @@ class BaseBigInteger:
         z0, z0neg = self._multiply_numbers(b, d)
         z1, z1neg = self._multiply_numbers(self._add_numbers(a, False, b, False)[0], self._add_numbers(c, False, d, False)[0])
 
-        # Do the additions needed. A little more longwinded that previously,
-        # as we have to separate them out with the new implementation.
+        # Do the additions needed:
+        # z2.shift(2*m)+(z1-z2-z0).shift(m)+z0
         z2z0, z2z0neg = self._add_numbers(z2, z1neg, z0, z0neg)
+
         # This subtraction is done by changing the sign and adding:
         zmiddle, zmneg = self._add_numbers(z1, z1neg, z2z0, not z2z0neg)
-        zmiddle = np.append(np.zeros(m, dtype=self._store), zmiddle)
 
-        zends, zendsneg = self._add_numbers(np.append(np.zeros(m << 1, dtype=self._store), z2), z2neg,
-                                            z0, z0neg)
-        return self._add_numbers(zends, zendsneg, zmiddle, zmneg)
-    
-        #return z2.shift(2*m)+(z1-z2-z0).shift(m)+z0
+        zends, zendsneg = self._add_numbers(np.pad(z2, (m << 1, 0)),
+                                            z2neg, z0, z0neg)
+        return self._add_numbers(zends, zendsneg, 
+                                 np.pad(zmiddle, (m, 0)), zmneg)
 
-    def get_bigger_smaller(self, x, y):
+    @staticmethod
+    def get_bigger_smaller(x, y):
         # Swap if longer
         if (len(x) < len (y)):
             return y,x
@@ -256,7 +255,7 @@ class BaseBigInteger:
         if shift_num == 0:
             return result
         elif shift_num > 0:
-            result._number = np.append(np.zeros(shift_num, dtype=self._store), result._number)
+            result._number = np.pad(result._number, (shift_num, 0))
         elif len(result._number) + shift_num > 0:
             result._number = np.delete(result._number, range(0,-shift_num))
         else:
